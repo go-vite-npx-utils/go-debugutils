@@ -172,3 +172,16 @@ func TestDebugID(t *testing.T) {
 		t.Errorf("expected debug_id length %d, got %d", debugIDLen, len(id1))
 	}
 }
+
+func TestSignalDepthHandler(t *testing.T) {
+	r := chi.NewRouter()
+	r.Get("/api/debug/signal-depth", SignalDepthHandler)
+
+	req := httptest.NewRequest("GET", "/api/debug/signal-depth", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", w.Code)
+	}
+}
