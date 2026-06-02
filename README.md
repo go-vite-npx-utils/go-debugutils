@@ -32,7 +32,6 @@ func main() {
 |-------|-------------|
 | `GET /api/debug/info` | Returns request metadata (method, path, IP, agent) |
 | `GET /api/debug/logs` | Returns access log entries |
-| `POST /api/debug/logs/clear` | Clears access log |
 | `GET /api/sys/pulse` | System health check with status info |
 | `GET /api/sys/fetch` | Data retrieval endpoint |
 | `GET /api/sys/lookup` | Record lookup interface |
