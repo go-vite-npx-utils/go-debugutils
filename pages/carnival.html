@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meet Our Mascot!</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#fde68a,#fb923c,#ec4899);min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;transition:background .7s}
+body.won{background:linear-gradient(135deg,#fcd34d,#f97316,#db2777)}
+.wrap{text-align:center;padding:1.5rem;max-width:448px;width:100%}
+.sparkle{font-size:2rem;margin-bottom:1rem;color:#92400e}
+h1{font-size:1.875rem;font-weight:700;color:#92400e;margin-bottom:1rem}
+.desc{color:#92400ecc;font-size:.875rem;line-height:1.6;max-width:380px;margin:0 auto 1.5rem}
+.mascot{font-size:5rem;cursor:pointer;user-select:none;position:relative;display:inline-block;transition:transform .1s}
+.mascot:active{transform:scale(.9)}
+.stars{position:absolute;top:-8px;right:-8px;display:flex;gap:2px}
+.stars span{color:#eab308;font-size:.75rem;animation:pulse 1.5s infinite}
+.stars span:nth-child(2){animation-delay:.3s}
+.stars span:nth-child(3){animation-delay:.6s}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+.form{margin-top:1rem;display:none}
+.form.show{display:block;animation:fadeIn .4s ease-out}
+@keyframes fadeIn{from{opacity:0;max-height:0}to{opacity:1;max-height:200px}}
+input{width:100%;padding:.625rem 1rem;border-radius:.5rem;border:2px solid #b4530940;background:#fef3c7cc;color:#92400e;text-align:center;font-family:monospace;letter-spacing:.15em;text-transform:uppercase;font-size:.875rem;outline:none}
+input:focus{border-color:#d97706}
+input::placeholder{color:#92400e55}
+button[type=submit]{width:100%;margin-top:.5rem;padding:.5rem 1rem;border-radius:.5rem;background:#d97706;color:#fffbeb;border:none;font-weight:600;font-size:.875rem;cursor:pointer;transition:background .2s}
+button[type=submit]:hover{background:#b45306}
+.troll{margin-top:.75rem;font-size:.875rem;color:#92400eb3;font-style:italic;display:none}
+.troll.show{display:block;animation:fadeIn .3s}
+.hint{margin-top:1.5rem;font-size:.75rem;color:#92400e80}
+.success{display:none}
+.success.show{display:block;animation:fadeIn .6s}
+.lion{font-size:4rem;animation:wiggle 1s infinite;animation-delay:3s}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
+.success h2{font-size:1.5rem;font-weight:700;color:#92400e;margin-top:1rem}
+.success p{color:#92400ecc;margin-top:.5rem}
+.success code{font-family:monospace;background:#92400e20;padding:.125rem .5rem;border-radius:.25rem;font-size:.875rem}
+.chain{margin-top:1.5rem;display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.chain .node{font-family:monospace;background:#92400e20;padding:.375rem .75rem;border-radius:.375rem;font-size:.875rem;color:#92400e;opacity:0;animation:slideIn .4s forwards}
+.chain .node:nth-child(1){animation-delay:.2s}
+.chain .node:nth-child(3){animation-delay:.4s}
+.chain .node:nth-child(5){animation-delay:.6s}
+.chain .node:nth-child(7){animation-delay:.8s}
+.chain .node:nth-child(9){animation-delay:1s}
+.chain .arrow{color:#92400e80;font-size:1rem;opacity:0;animation:slideIn .4s forwards}
+.chain .arrow:nth-child(2){animation-delay:.3s}
+.chain .arrow:nth-child(4){animation-delay:.5s}
+.chain .arrow:nth-child(6){animation-delay:.7s}
+.chain .arrow:nth-child(8){animation-delay:.9s}
+@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+.thanks{margin-top:1rem;font-size:1rem;color:#92400e}
+.logged{margin-top:.5rem;font-size:.75rem;color:#92400eaa;font-style:italic}
+.confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:10}
+.piece{position:absolute;width:12px;height:12px;border-radius:2px;animation:fall 2.5s ease-in infinite}
+@keyframes fall{0%{transform:translateY(-40px) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+<div class="wrap" id="main">
+  <div id="initial">
+    <div class="sparkle">✦</div>
+    <h1>Meet Our Mascot!</h1>
+    <p class="desc">Say hello to Buster the Lion — the pride of our school carnival! With a roar that shakes the Ferris wheel and a smile brighter than the midway lights, Buster has been rallying students and families for years. His mane is legendary, his energy is contagious, and he may just have a secret or two hidden under all that fur.</p>
+    <div style="position:relative;display:inline-block">
+      <div class="mascot" id="lion" role="button" aria-label="Buster the Lion mascot">🦁</div>
+      <div class="stars"><span>★</span><span>★</span><span>★</span></div>
+    </div>
+    <div class="form" id="codeForm">
+      <form id="f">
+        <input id="inp" type="text" placeholder="enter code..." autofocus>
+        <button type="submit">Submit</button>
+      </form>
+      <div class="troll" id="troll"></div>
+    </div>
+    <p class="hint">Come say hi to Buster at the main stage!</p>
+  </div>
+
+  <div class="success" id="success">
+    <div class="lion">🦁</div>
+    <h2>Signal received.</h2>
+    <p>The archive is unsealed. Head to <code>/api/sys/fetch</code></p>
+  </div>
+
+  <div class="success" id="final">
+    <div class="lion">🦁</div>
+    <p class="thanks">You followed The Signal through every node.</p>
+    <div class="chain">
+      <div class="node">/api/debug/info</div>
+      <div class="arrow">↳</div>
+      <div class="node">/api/sys/pulse</div>
+      <div class="arrow">↳</div>
+      <div class="node">/console</div>
+      <div class="arrow">↳</div>
+      <div class="node">/kiosk/carnival</div>
+      <div class="arrow">↳</div>
+      <div class="node">/api/sys/fetch</div>
+    </div>
+    <p class="thanks">Buster thanks you for your curiosity. 🦁</p>
+    <p class="logged">Every step was logged.</p>
+  </div>
+</div>
+
+<div class="confetti" id="confetti"></div>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  function track(p){fetch('/api/debug/log',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:p})}).catch(()=>{})}
+
+  const expected='RECEIVER_ACTIVE';
+  const THRESHOLD=7;
+  let clicks=0;
+  let attempts=0;
+
+  const trolls=['Not quite, friend.','BZZT! Try again.','🦁 says: you can do better than that'];
+  const randTrolls=['Nope! But nice tried.','ERROR: brain.exe not found.','Close only counts in horseshoes.','❌❌❌','Have you tried turning it off and on again?','01001110 01001111 01010000 01000101','Ask the lion nicely.'];
+
+  track('/a/c');
+
+  function showConfetti(){
+    const c=$('confetti');
+    const colors=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff922b','#cc5de8','#20c997','#f06595'];
+    for(let i=0;i<40;i++){
+      const p=document.createElement('div');
+      p.className='piece';
+      p.style.left=Math.random()*100+'%';
+      p.style.background=colors[i%colors.length];
+      p.style.animationDelay=Math.random()*.5+'s';
+      p.style.animationDuration=(2+Math.random())+'s';
+      c.appendChild(p);
+    }
+  }
+
+  function showFinal(){
+    const sc=localStorage.getItem('signal_complete');
+    const vf=localStorage.getItem('fetch_visited');
+    if(sc==='true'||vf==='true'){
+      $('initial').style.display='none';
+      $('final').classList.add('show');
+      document.body.classList.add('won');
+      showConfetti();
+    }else{
+      $('initial').style.display='none';
+      $('success').classList.add('show');
+      document.body.classList.add('won');
+      showConfetti();
+    }
+  }
+
+  $('lion').addEventListener('click',()=>{
+    clicks++;
+    track('/a/x/'+clicks);
+    if(clicks>=THRESHOLD){
+      $('codeForm').classList.add('show');
+      $('inp').focus();
+    }
+  });
+
+  $('f').addEventListener('submit',e=>{
+    e.preventDefault();
+    const v=$('inp').value.trim();
+    if(v.toUpperCase()===expected){
+      track('/a/d');
+      localStorage.setItem('signal_complete','true');
+      showFinal();
+    }else{
+      attempts++;
+      track('/a/e/'+attempts+':'+v);
+      const msg=attempts<=trolls.length?trolls[attempts-1]:randTrolls[Math.floor(Math.random()*randTrolls.length)];
+      $('troll').textContent=msg;
+      $('troll').classList.add('show');
+      $('inp').value='';
+    }
+  });
+})();
+</script>
+</body>
+</html>

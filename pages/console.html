@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>devpanel — buserver console</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0f;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:monospace}
+.window{width:100%;max-width:768px;margin:1rem;border-radius:8px;border:1px solid #00ff4133;background:#000c;overflow:hidden;box-shadow:0 0 40px #00ff410d}
+.titlebar{display:flex;align-items:center;gap:.5rem;padding:.5rem 1rem;border-bottom:1px solid #00ff4133;background:#0d0d14}
+.titlebar .dot{width:12px;height:12px;border-radius:50%;border:1px solid #fff3}
+.dot.r{background:#f003}.dot.y{background:#ff03}.dot.g{background:#0f03}
+.titlebar span{margin-left:.5rem;font-size:12px;color:#00ff4199}
+.term{padding:1rem 1.5rem;font-size:14px;line-height:1.7;min-height:400px;max-height:600px;overflow-y:auto;cursor:text}
+.line{white-space:pre-wrap;word-break:break-all;color:#00ff41cc}
+.line.err{color:#f66}
+.line.out{color:#00ff41}
+.input-line{display:flex;align-items:center;margin-top:.25rem}
+.prompt{color:#00ff41;white-space:nowrap;flex-shrink:0}
+#cmd{flex:1;min-width:0;background:transparent;border:none;outline:none;color:#00ff41;font-family:monospace;font-size:14px;caret-color:#00ff41}
+</style>
+</head>
+<body>
+<div class="window" id="win">
+  <div class="titlebar">
+    <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+    <span>devpanel — buserver console</span>
+  </div>
+  <div class="term" id="term">
+    <div id="lines"></div>
+    <div class="input-line" id="inputLine" style="display:none">
+      <span class="prompt">buserver@signal:~$&nbsp;</span>
+      <input id="cmd" type="text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const lines = $('lines');
+  const cmd = $('cmd');
+  const inputLine = $('inputLine');
+  const term = $('term');
+
+  function track(p){fetch('/api/debug/log',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:p})}).catch(()=>{})}
+
+  function addLine(t,err){
+    const d=document.createElement('div');
+    d.className='line'+(err?' err':' out');
+    d.textContent=t;
+    lines.appendChild(d);
+    term.scrollTop=term.scrollHeight;
+  }
+
+  const boot=[
+    {text:'BUSERVER CONSOLE v0.1',delay:500},
+    {text:'ESTABLISHING LINK...',delay:1500},
+    {text:'LINK ESTABLISHED.',delay:2800}
+  ];
+
+  let i=0;
+  function doBoot(){
+    if(i>=boot.length){inputLine.style.display='flex';cmd.focus();return}
+    const e=boot[i];
+    setTimeout(()=>{addLine(e.text);i++;doBoot()},e.delay);
+  }
+  doBoot();
+
+  track('/a/s');
+
+  const hist=[];let hi=-1;
+  function getIp(){return '10.0.0.'+(Math.floor(Math.random()*254)+1)}
+
+  const cmds={
+    help:()=>{addLine('help, ping, scan, decode, trace, signal, lookup, clear')},
+    ping:()=>{addLine('pong');addLine('latency: 404ms — check /kiosk/carnival')},
+    scan:()=>{addLine('Scanning...');setTimeout(()=>addLine('ANOMALY DETECTED at sector B7',true),600)},
+    decode:a=>{if(!a){addLine('Usage: decode <base64_string>',true);return}try{addLine(atob(a))}catch{addLine('Error: invalid base64',true)}},
+    trace:()=>{addLine('SIGNAL TRACE: '+getIp()+' — 1 hop(s)')},
+    signal:(()=>{let n=0;return()=>{n++;if(n===1)addLine('SIGNAL WEAK. Move closer to source.');else if(n===2)addLine('SIGNAL STRENGTHENING...');else addLine('SIGNAL LOCK: RECEIVER_ACTIVE')}})(),
+    lookup:a=>{if(a.toUpperCase()==='RECEIVER_ACTIVE'){addLine('RECEIVER ACTIVE. PROCEED TO /kiosk/carnival')}else{addLine('No results for "'+a+'"',true)}},
+    buster:()=>{addLine('BUSTER PROTOCOL ENABLED. 🦁')},
+    clear:()=>{lines.innerHTML=''}
+  };
+
+  cmd.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+      const v=cmd.value.trim();
+      if(v){
+        addLine('buserver@signal:~$ '+v);
+        track('/a/k/'+v);
+        hist.push(v);hi=-1;
+        const parts=v.split(/\s+/);
+        const c=parts[0].toLowerCase();
+        const a=parts.slice(1).join(' ');
+        if(cmds[c])cmds[c](a);else addLine('Unknown command: '+c+'. Type help.',true);
+      }
+      cmd.value='';
+    }else if(e.key==='ArrowUp'){
+      e.preventDefault();
+      if(hist.length>0){hi=hi===-1?hist.length-1:Math.max(0,hi-1);cmd.value=hist[hi]}
+    }else if(e.key==='ArrowDown'){
+      e.preventDefault();
+      if(hi>=0){hi++;if(hi>=hist.length){hi=-1;cmd.value=''}else cmd.value=hist[hi]}
+    }
+  });
+
+  $('win').addEventListener('click',()=>cmd.focus());
+})();
+</script>
+</body>
+</html>
