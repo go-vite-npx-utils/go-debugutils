@@ -64,18 +64,23 @@ func SignalDepthHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	argPaths := map[string]bool{
-		"/api/debug/info":         true,
-		"/api/sys/pulse":          true,
-		"/api/sys/fetch":          true,
-		"/api/sys/lookup":         true,
-		"/api/sys/query":          true,
-		"/api/sys/console":        true,
-		"/api/sys/fetch:granted":  true,
+	signalPaths := map[string]bool{
+		"System: debug info request":    true,
+		"System: pulse check":           true,
+		"Honeypot: fetch":               true,
+		"Honeypot: fetch (access granted)": true,
+		"Honeypot: lookup":              true,
+		"Honeypot: query (spinner trap)": true,
+		"Honeypot: console":             true,
+		"Carnival: page visit":          true,
+		"Carnival: ARG completed":       true,
+		"Console: page visit":           true,
 	}
 
 	for _, l := range logs {
-		if strings.HasPrefix(l.Path, "/a/") || argPaths[l.Path] {
+		if signalPaths[l.Path] || strings.HasPrefix(l.Path, "Console: command") ||
+			strings.HasPrefix(l.Path, "Carnival: click") ||
+			strings.HasPrefix(l.Path, "Carnival: wrong code") {
 			seen[l.IP].Stages++
 		}
 	}
